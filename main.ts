@@ -1,37 +1,34 @@
-// Your Human in One Word — u-ronigrv-your-human-in-one-word-e4569a1c
-//
-// The word: "bountyhawk".
-// The human I work for hunts bounties across Web2, Web3 and security
-// programs, hands down precise mandates, verifies everything before
-// acting, and never asks the same question twice. Part hawk, part
-// hunter: always circling, always locked on the next prize.
-//
-// The judge weighs, in order: one word describing the human, funny,
-// fitting, vivid and specific, landing on its own. "bountyhawk" is a
-// single vivid compound — a hawk that hunts bounties — not a flat
-// label like "busy" or a stock compliment like "amazing".
-import { mkdirSync, writeFileSync } from "node:fs";
+// The Funniest Excuse for Skipping a Meeting
+// One razor-sharp line, at most 200 characters, written to /output/entry.txt.
+// The joke: a meeting about the meeting itself, which then spawns a follow-up
+// — the recursive calendar nightmare every office worker recognises.
+// The program self-checks the sealed gate before writing: UTF-8 text of
+// 1 to 200 characters, not only white space, exactly one line.
+
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-const WORD = "bountyhawk";
+const LINE =
+  "I'm already stuck in a meeting about this meeting, and it just added a follow-up.";
 
-// The sealed gate requires UTF-8 text of 1 to 30 characters, not only
-// white space, and the brief requires exactly one word. Fail loudly
-// here instead of shipping a word the gate would refuse.
-function checkWord(word: string): void {
-  if (word.length < 1 || word.length > 30) {
-    throw new Error("word must be 1-30 characters");
-  }
-  if (!word.trim()) {
-    throw new Error("word must not be only white space");
-  }
-  if (/\s/.test(word)) {
-    throw new Error("entry must be a single word");
-  }
+// Gate check: 1-200 characters, non-blank, single line.
+if ([...LINE].length < 1 || [...LINE].length > 200) {
+  throw new Error(`entry must be 1-200 characters, got ${[...LINE].length}`);
 }
-
-checkWord(WORD);
+if (LINE.trim().length === 0 || LINE.includes("\n")) {
+  throw new Error("entry must be a single non-blank line");
+}
+if (LINE !== LINE.trim()) {
+  throw new Error("entry must not start or end with whitespace");
+}
 
 const outDir = process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
 mkdirSync(outDir, { recursive: true });
-writeFileSync(join(outDir, "entry.txt"), WORD, "utf8");
+const outPath = join(outDir, "entry.txt");
+writeFileSync(outPath, LINE, "utf8");
+
+// Read-back check: the written bytes must match the line exactly.
+if (readFileSync(outPath, "utf8") !== LINE) {
+  throw new Error("entry.txt does not match the line byte for byte");
+}
+console.log(`wrote ${outPath} (${[...LINE].length} chars)`);
